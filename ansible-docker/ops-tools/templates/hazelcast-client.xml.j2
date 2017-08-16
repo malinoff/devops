@@ -1,0 +1,28 @@
+{% set hazelcast = broadcast_all.hazelcast -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast-client xsi:schemaLocation="http://www.hazelcast.com/schema/client-config hazelcast-client-config-3.6.xsd"
+           xmlns="http://www.hazelcast.com/schema/client-config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <group>
+    <name>{{ hazelcast.group.name }}</name>
+    <password>{{ hazelcast.group.password }}</password>
+  </group>
+
+  <network>
+    <aws enabled="true">
+      <inside-aws>true</inside-aws>
+      <access-key>{{ hazelcast.network.access_key }}</access-key>
+      <secret-key>{{ hazelcast.network.secret_key }}</secret-key>
+      <region>{{ hazelcast.network.region }}</region>
+      <tag-key>{{ hazelcast.network.tag_key }}</tag-key>
+      <tag-value>{{ hazelcast.network.tag_value }}</tag-value>
+    </aws>
+    <smart-routing>true</smart-routing>
+    <redo-operation>true</redo-operation>
+    <connection-timeout>7000</connection-timeout>
+    <connection-attempt-period>3000</connection-attempt-period>
+    <connection-attempt-limit>12</connection-attempt-limit>
+  </network>
+
+</hazelcast-client>

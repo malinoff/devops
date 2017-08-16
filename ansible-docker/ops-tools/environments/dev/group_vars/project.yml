@@ -1,0 +1,43 @@
+project:
+  capacity: 5
+  listeners:
+    capacity: 5
+  port: 8080
+  published_port: 8096
+  heartbeat_url: "/client/project/passthrough/marco"
+  callbackPath: "/client/project/passthrough/notify"
+  stream:
+    uri: "https://stream-test.foobar.biz"
+    authkey: key
+    authtoken: token
+  move:
+    url: "wss://move.foobar.biz/ws"
+  hls:
+    url: "https://stream-test.foobar.biz/static/${id}.m3u8"
+    recording: "true"
+    fileExtension: ".m3u8"
+    retainFile: "true"
+  timeout_seconds: 30
+  chat:
+    user_min_speed: 4
+    user_max_speed: 20
+    max_per_minute: 150
+  ssl:
+    trust_store: "secure.ts"
+    trust_store_password: "password"
+  swagger_enabled: "true"
+  env:
+    ENV: dev
+    JAVA_OPTS: "-Xmx2g -Dlog4j.configuration=envconfig/dev/log4j.xml"
+  api:
+    uri: "https://api.dev.company.com"
+  other_service:
+    uri: "http://other.dev.company.com"
+    followers_limit: 1000000
+  token:
+    shared_key: "sharedkey"
+    expiration: 10
+  pubnub:
+    publish_key: "publish_key"
+    subscribe_key: "subscribe_key"
+    secure: "false"

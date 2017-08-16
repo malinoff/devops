@@ -1,0 +1,35 @@
+project {
+  capacity={{ project.capacity }}
+  listeners.capacity={{ project.listeners.capacity }}
+  heartbeat.url="{{ project.heartbeat_url }}"
+  stream.uri="{{ project.stream.uri }}"
+  callbackPath="{{ project.callbackPath }}"
+  stream.authkey={{ project.stream.authkey }}
+  stream.authtoken={{ project.stream.authtoken }}
+  move.url="{{ project.move.url }}"
+  hls.url="{{ project.hls.url }}"
+  hls.recording={{ project.hls.recording }}
+  hls.retainFile={{ project.hls.retainFile }}
+  hls.fileExtension={{ project.hls.fileExtension }}
+  timeout.seconds={{ project.timeout_seconds }}
+  chat.user_min_speed={{ project.chat.user_min_speed }}
+  chat.user_max_speed={{ project.chat.user_max_speed }}
+  chat.max_per_minute={{ project.chat.max_per_minute }}
+  ssl.trustStore="{{ project.ssl.trust_store }}"
+  ssl.trustStorePassword="{{ project.ssl.trust_store_password }}"
+}
+
+swagger.enabled={{ project.swagger_enabled }}
+
+api.uri="{{ project.api.uri }}"
+other_project.uri="{{ project.other_project.uri }}"
+other_project.followers_limit="{{ project.other_project.followers_limit }}"
+
+token.shared.key="{{ project.token.shared_key }}"
+token.expiration={{ project.token.expiration }}
+
+pubnub {
+  publish.key="{{ project.pubnub.publish_key }}"
+  subscribe.key="{{ project.pubnub.subscribe_key }}"
+  secure={{ project.pubnub.secure }}
+}

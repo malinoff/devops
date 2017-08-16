@@ -1,0 +1,28 @@
+{% set hazelcast = broadcast_all.hazelcast -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.6.xsd"
+           xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <group>
+    <name>{{ hazelcast.group.name }}</name>
+    <password>{{ hazelcast.group.password }}</password>
+  </group>
+
+  <network>
+    <public-address>${public.address}:5701</public-address>
+    <port auto-increment="false">5701</port>
+    <join>
+      <multicast enabled="false"/>
+      <tcp-ip enabled="false"/>
+      <aws enabled="true">
+        <access-key>{{ hazelcast.network.access_key }}</access-key>
+        <secret-key>{{ hazelcast.network.secret_key }}</secret-key>
+        <region>{{ hazelcast.network.region }}</region>
+        <tag-key>{{ hazelcast.network.tag_key }}</tag-key>
+        <tag-value>{{ hazelcast.network.tag_value }}</tag-value>
+      </aws>
+    </join>
+  </network>
+
+</hazelcast>

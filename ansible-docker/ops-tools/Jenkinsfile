@@ -1,0 +1,98 @@
+#!groovy
+
+message = 'something gone bad'
+version = 'n/a'
+dockerRegistryUrl = "http://registry:5000"
+dockerRegistryCredentialsId = "docker-registry"
+
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          message = 'packaging failed'
+          ansiColor('xterm') {
+            // Add [SKIP_CI] flag to all CI Jenkins jobs
+            result = sh (script: 'git log -1 | grep -i skip_ci', returnStatus: true)
+            if (result == 0) {
+              currentBuild.result = 'ABORTED'
+              error "Build has been canceled, because of SKIP_CI flag found in commit message"
+            }
+
+            sh "touch .skip-task-scanner .skip-publish-findbugs-results .skip-archive-generated-artifacts"
+            pom = readMavenPom file: 'pom.xml'
+            version = VersionNumber(pom.version.replace('SNAPSHOT', '') + '${BUILD_DATE_FORMATTED, "yyyyMMdd"}-${BUILDS_TODAY}')
+            currentBuild.description = "${version}"
+
+            sh "./do.sh buildcontainer"
+            withMaven(mavenSettingsConfig: 'maven-public') {
+              sh "VERSION=${version} ./do.sh build"
+            }
+          }
+        }
+      }
+    }
+    stage('Unit testing') {
+      steps {
+        script {
+          message = 'unit testing failed'
+          ansiColor('xterm') {
+            sh "./do.sh test"
+            junit '**/target/surefire-reports/*.xml'
+          }
+        }
+      }
+    }
+    stage('Docker Build & Push') {
+      steps {
+        script {
+          message = 'docker build & push failed'
+          ansiColor('xterm') {
+            sh "./do.sh package"
+
+            docker.withRegistry(dockerRegistryUrl, dockerRegistryCredentialsId) {
+              image = docker.image("company-project:${version}")
+              image.push()
+            }
+            milestone label: 'Artifacts packaged and uploaded'
+          }
+        }
+      }
+    }
+    stage('Deploy to QA & Run sanity checks') {
+      steps {
+        lock("environment-qa") {
+          script {
+            message = 'deploy to qa failed'
+
+            def args = "version=${version} serial=1 ansible_ssh_user=jenkins"
+            ansiColor('xterm') {
+              sshagent(['ssh-key']) {
+                sh """
+                  export ANSIBLE_FORCE_COLOR=true
+                  cd ops-tools
+                  ansible-playbook -i environments/qa deploy.yml -v -e "${args}"
+                """
+              }
+            }
+
+            message = 'sanity check failed'
+            git changelog: false, credentialsId: 'integration', poll: false, url: 'git@github.com:company/integration-tests.git'
+            withMaven(maven: 'maven-3.3.9', mavenSettingsConfig: 'vertigo-public') {
+              sh "mvn test -Dcompany.env=qa -Dtest=ProjectSanityCheckSuite"
+            }
+            junit 'target/surefire-reports/*.xml'
+          }
+        }
+      }
+    }
+  }
+  post {
+    failure {
+      slackSend channel: env.SLACK_CHANNEL,
+                color: 'danger',
+                message: "`company-project:${version}` ${message}\n${env.BUILD_URL}"
+    }
+  }
+}

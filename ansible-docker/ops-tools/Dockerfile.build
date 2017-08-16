@@ -1,0 +1,17 @@
+FROM maven:3-jdk-8-alpine
+MAINTAINER Dmitry Malinovsky <dmalinovsky@company.com>
+
+ARG UID
+ARG GID
+ARG EXTERNAL_HOME
+
+RUN apk update \
+ && apk add bash tzdata \
+ && rm -rf /var/cache/apk/*
+
+RUN addgroup -g $GID jenkins || true \
+ && adduser -s /bin/bash -h $EXTERNAL_HOME -g '' -u $UID -G $(getent group $GID | cut -d: -f1) jenkins || true \
+ && echo "UTC" > /etc/timezone \
+ && ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
+WORKDIR $EXTERNAL_HOME

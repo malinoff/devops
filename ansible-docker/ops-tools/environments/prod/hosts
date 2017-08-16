@@ -1,0 +1,5 @@
+[project-secured]
+host ansible_host=company.com
+
+[project:children]
+project-secured

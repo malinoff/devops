@@ -1,0 +1,84 @@
+---
+- hosts: project
+  vars_prompt:
+  - name: version
+    prompt: project version
+    private: no
+  - name: project_serial
+    prompt: Rolling update batch size
+    default: 1
+  serial: "{{ project_serial }}"
+  tasks:
+  - name: Make sure pip is present
+    apt:
+      name: python-pip
+      state: present
+      update_cache: yes
+
+  - name: Make sure pip is up to date
+    pip:
+      name: pip
+      state: latest
+
+  - name: Make sure docker-py is present
+    pip:
+      name: docker-py~=1.10
+      state: present
+
+  - name: Make sure configuration directory is present
+    file:
+      path: /etc/company/project
+      state: directory
+
+  - name: Make sure configuration is present
+    template:
+      src: "templates/{{ item }}.j2"
+      dest: "/etc/company/project/{{ item }}"
+    with_items:
+    - hazelcast.xml
+    - hazelcast-client.xml
+    - company-project.conf
+    - application.yml
+    register: config
+
+  - name: Make sure all necessary files are present
+    copy:
+      src: "{{ inventory_dir }}/files/log4j.xml"
+      dest: "/etc/company/project/log4j.xml"
+    register: files
+
+  - name: Make sure we're logged in the private registry
+    docker_login:
+      username: "{{ docker.registry.username }}"
+      password: "{{ docker.registry.password }}"
+      registry: "{{ docker.registry.url }}"
+
+  # Just a sanity check that we have the image requested
+  - name: Pull the image
+    shell: docker pull {{ docker.registry.url }}/company-project:{{ version }}
+
+  - name: Make sure a correct project container is present
+    docker_container:
+      name: company-project
+      state: started
+      restart: "{{ config | changed or files | changed }}"
+      image: "{{ docker.registry.url }}/company-project:{{ version }}"
+      log_driver: "{{ docker.log_driver | default('json-file') }}"
+      log_options: "{{ docker.log_options | default({}) }}"
+      volumes:
+      - "/etc/company/project:/data/company_project/config/envconfig/{{ project.env.PROJECT_ENV }}"
+      published_ports:
+      - "{{ project.published_port }}:{{ project.port }}"
+      - "5701:5701"
+      env: "{{ project.env }}"
+    tags: deploy
+
+  - name: Smoke check the service
+    uri:
+      url: "http://localhost:{{ project.published_port }}/health"
+      return_content: yes
+    register: health
+    until: health.status == 200 and health.json['message'] == 'healthy'
+    retries: 20
+    delay: 2
+    tags: deploy

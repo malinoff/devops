@@ -1,0 +1,12 @@
+# This file is supposed to be encrypted using ansible-vault
+project:
+  stream:
+    authtoken: token
+  ssl:
+    trust_store_password: "password"
+  token:
+    shared_key: "sharedkey"
+  pubnub:
+    publish_key: "publish_key"
+    subscribe_key: "subscribe_key"
+    secure: "false"

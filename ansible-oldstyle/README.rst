@@ -15,5 +15,5 @@ The intended usage is like::
     $ ansible-playbook -i environments/beta actions/configure.yml
 
 Overall layout is too complicated and bloated with copy-paste,
-you may want to look at ``ansible`` directory containing more recent
+you may want to look at ``ansible-docker`` directory containing more recent
 layout I'm using.

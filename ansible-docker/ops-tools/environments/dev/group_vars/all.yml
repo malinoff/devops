@@ -1,0 +1,16 @@
+docker:
+  registry:
+    url: registry:5000
+    username: user
+    password: pass
+broadcast_all:
+  hazelcast:
+    group:
+      name: company-dev
+      password: pass
+    network:
+      access_key: ACCESS_KEY
+      secret_key: SECRET_KEY
+      region: us-west-2
+      tag_key: Hazelcast
+      tag_value: dev
