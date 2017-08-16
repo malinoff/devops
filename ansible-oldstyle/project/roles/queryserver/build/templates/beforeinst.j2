@@ -1,0 +1,2 @@
+#!/bin/bash
+id -u project-queryserver &>/dev/null || useradd -d /{{ queryserver.home_dir }}/ -U -M -s /sbin/nologin -U project-queryserver

@@ -1,0 +1,21 @@
+[Unit]
+Description=Ad Server
+
+[Service]
+Type=forking
+# Default environment variables, i.e. configuration
+Environment="PROCESSES=1" "LOGFILE_OUT={{ queryserver.log_dir }}/output.log" "LOGFILE_ERR={{ queryserver.log_dir }}/error.log"
+# These variables will override the variables above
+EnvironmentFile=/etc/sysconfig/{{ project_uid }}/{{ queryserver_uid }}
+StandardOutput=null
+
+ExecStart={{ queryserver.home_dir }}/node_modules/pm2/bin/pm2 -i $PROCESSES start {{ queryserver.home_dir }}/server.js -o $LOGFILE_OUT -e $LOGFILE_ERR
+
+ExecStop={{ queryserver.home_dir }}/node_modules/pm2/bin/pm2 delete all
+ExecStop={{ queryserver.home_dir }}/node_modules/pm2/bin/pm2 kill
+
+User=project-queryserver
+Group=project-queryserver
+
+[Install]
+WantedBy=multi-user.target

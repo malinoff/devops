@@ -1,0 +1,7 @@
+---
+# Should not be changed
+project_uid: "company/project"
+queryserver_uid: "queryserver"
+queryserver:
+    home_dir: "/opt/{{ project_uid }}/{{ queryserver_uid }}"
+    log_dir: "/var/log/{{ project_uid }}/{{ queryserver_uid }}"

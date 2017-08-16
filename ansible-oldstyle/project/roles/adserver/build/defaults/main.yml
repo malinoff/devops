@@ -1,0 +1,7 @@
+---
+# Should not be changed
+project_uid: "company/project"
+adserver_uid: "adserver"
+adserver:
+    home_dir: "/opt/{{ project_uid }}/{{ adserver_uid }}"
+    log_dir: "/var/log/{{ project_uid }}/{{ adserver_uid }}"

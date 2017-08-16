@@ -1,0 +1,24 @@
+---
+- hosts: adserver
+  gather_facts: no
+  roles:
+    - role: adserver/prepare
+      tags: adserver
+
+- hosts: queryserver
+  gather_facts: no
+  roles:
+    - role: queryserver/prepare
+      tags: queryserver
+
+- hosts: workserver
+  gather_facts: no
+  roles:
+    - role: workserver/prepare
+      tags: workserver
+
+- hosts: dashboard
+  gather_facts: no
+  roles:
+    - role: dashboard/prepare
+      tags: dashboard

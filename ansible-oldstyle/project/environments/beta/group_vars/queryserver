@@ -1,0 +1,11 @@
+---
+queryserver:
+    environment: beta
+    ads_mongo_uri: 'mongodb://beta-ads:mongo:47942,mongo:47942/beta-ads?replicaSet=rs-ds047942'
+    s3_reports_bucket: beta-ads-queries
+    logentries_token: this-was-a-token
+    log_level: warn
+    NEW_RELIC_APP_NAME: beta-query-server
+    NEW_RELIC_LICENSE_KEY: this-was-a-token
+    NEW_RELIC_API_KEY: this-was-a-token
+    PORT: 8080

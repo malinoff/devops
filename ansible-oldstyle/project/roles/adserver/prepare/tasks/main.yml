@@ -1,0 +1,37 @@
+---
+- name: Install npm packages
+  shell: "npm install"
+  args:
+    chdir: "{{ adserver.home_dir }}"
+
+- name: Run gulp tasks
+  shell: gulp build
+  args:
+    chdir: "{{ adserver.home_dir }}"
+
+- name: Make sure sysconfig dir exists
+  file: path=/etc/sysconfig/{{ project_uid }}/ state=directory
+
+- name: Prepare environment variables
+  template: src=config.j2 dest=/etc/sysconfig/{{ project_uid }}/adserver
+
+- name: Prepare haproxy configuration
+  template: src=haproxy.j2 dest=/tmp/haproxy/project_adserver_backends.cfg
+
+- name: Update haproxy http frontend
+  shell: echo "    use_backend project-adserver-back-http if { hdr(host) -i {{ 'test' if adserver.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/http_frontend.cfg
+
+- name: Update haproxy https frontend
+  shell: echo "    use_backend project-adserver-back-https if { req_ssl_sni -i {{ 'test' if adserver.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/https_frontend.cfg
+
+- name: Make sure logs dir is present
+  file: path={{ adserver.log_dir }} state=directory
+
+- name: Run the app
+  shell: >
+      set -a;
+      . /etc/sysconfig/{{ project_uid }}/adserver;
+      pm2 start server.js -o {{ adserver.log_dir }}/output.log -e {{ adserver.log_dir }}/output.log --name project-adserver ||
+      pm2 restart project-adserver
+  args:
+    chdir: "{{ adserver.home_dir }}"

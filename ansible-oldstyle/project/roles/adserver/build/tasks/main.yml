@@ -1,0 +1,91 @@
+---
+- set_fact: build_dir={{ playbook_dir }}/../../../build
+
+- name: Create build directory
+  file: name={{ build_dir }} state=directory
+
+- name: Make sure all necessary directories are present
+  file: path={{ build_dir }}/{{ item }} state=directory
+  with_items:
+    - "{{ adserver.home_dir }}"
+    - "{{ adserver.log_dir }}"
+    - "/etc/systemd/system/"
+    - "/etc/sysconfig/{{ project_uid }}"
+
+- name: Make sure all build dependencies are present
+  apt: name={{ item }} state=latest
+  sudo: yes
+  with_items:
+    - ruby
+    - ruby-dev
+    - rubygems
+    - build-essential
+    - git
+  when: ansible_os_family == 'Debian'
+
+- name: Make sure all build dependencies are present
+  yum: name={{ item }} state=latest
+  sudo: yes
+  with_items:
+    - ruby
+    - ruby-devel
+    - rubygems
+    - "@Development tools"
+    - git
+  when: ansible_os_family == 'RedHat'
+
+- name: Make sure fpm is installed
+  gem: name=fpm state=latest user_install=no
+  sudo: yes
+
+- name: Copy files
+  copy: src={{ playbook_dir }}/../../../adserver/{{ item }}
+        dest={{ build_dir }}/{{ adserver.home_dir }}/
+  with_items:
+    - globals.js
+    - gulpfile.js
+    - newrelic.js
+    - package.json
+    - Procfile
+    - server.js
+    - settings.js
+    - setup_logging.js
+    - public
+    - v1
+    - v2
+
+- name: Install npm packages
+  shell: npm install  # --production
+  args:
+    chdir: "{{ build_dir }}/{{ adserver.home_dir }}"
+
+- name: Install pm2 & gulp
+  npm: name={{ item }} path={{ build_dir }}/{{ adserver.home_dir }}
+  with_items:
+    - pm2
+    - gulp
+
+- name: Run gulp tasks
+  shell: ./node_modules/.bin/gulp build
+  args:
+    chdir: "{{ build_dir }}/{{ adserver.home_dir }}"
+
+- name: Make sure init.d script is present
+  # TODO what about non-systemd distros?
+  template: src=init/systemd
+            dest={{ build_dir }}/etc/systemd/system/project-{{ adserver_uid }}.service
+
+- name: Put all necessary files into the build dir
+  template: src={{ item }}.j2 dest={{ build_dir }}/{{ item }}
+  with_items:
+    - beforeinst
+    - beforerm
+    - afterinst
+
+- name: Put build script into the build dir
+  template: src=build.j2 dest={{ build_dir }}/build mode=0755
+
+- name: Build adserver package
+  shell: ./build
+  args:
+    chdir: "{{ build_dir }}"

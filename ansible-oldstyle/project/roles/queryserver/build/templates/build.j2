@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# `version` must be passed from the cli
+# I do not specify default value to fail ansible-playbook loudly
+
+fpm -s dir \
+      --name project-queryserver \
+      --version {{ version }} \
+      --iteration {{ iteration }} \
+      -a noarch \
+{% if ansible_os_family == 'RedHat' %}
+      -t rpm \
+      --rpm-user "project-queryserver" \
+      --rpm-group "project-queryserver" \
+      --rpm-defattrfile "644,project-queryserver,project-queryserver"
+      --rpm-defattrdir "644,project-queryserver,project-queryserver"
+{% else %}
+      -t deb \
+      --deb-user "project-queryserver" \
+      --deb-group "project-queryserver" \
+      --after-install afterinst \
+{% endif %}
+      --depends "nodejs" \
+      --directories {{ queryserver.home_dir }}/ \
+      --directories {{ queryserver.log_dir }}/ \
+      --vendor company \
+      --url http://company.com/ \
+      -m "Dmitry Malinovsky <dimitry.malinovsky@company.com>" \
+      --description "Adserver service" \
+      --before-install beforeinst \
+      --before-remove beforerm \
+      etc opt var

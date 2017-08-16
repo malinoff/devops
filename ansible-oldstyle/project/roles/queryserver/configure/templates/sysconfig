@@ -1,0 +1,3 @@
+{% for name, value in queryserver.items() -%}
+{{ name }}={{ value }}
+{% endfor -%}

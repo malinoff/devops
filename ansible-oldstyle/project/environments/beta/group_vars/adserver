@@ -1,0 +1,16 @@
+---
+adserver:
+    environment: beta
+    host_domain: beta.ads.company.com
+    region_name: eu-west-1
+    log_level: warn
+    queue_uri: amqp://rabbit/vhost
+    memcached_cluster: beta-ads-mc-ireland
+    ads_mongo_uri: 'mongodb://beta-ads:mongo:47942,mongo:47942/beta-ads?replicaSet=rs-ds047942'
+    redis_cluster: beta-ads-rs-ireland
+    logentries_token: this-was-a-token
+    UV_THREADPOOL_SIZE: 20
+    NEW_RELIC_APP_NAME: beta-ads-server-ireland
+    NEW_RELIC_LICENSE_KEY: this-was-a-key
+    NEW_RELIC_API_KEY: this-was-a-key
+    PORT: 8080

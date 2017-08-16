@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# `version` must be passed from the cli
+# I do not specify default value to fail ansible-playbook loudly
+
+fpm -s dir \
+      --name project-dashboard \
+      --version {{ version }} \
+      --iteration {{ iteration }} \
+      -a noarch \
+{% if ansible_os_family == 'RedHat' %}
+      -t rpm \
+      --rpm-user "project-dashboard" \
+      --rpm-group "project-dashboard" \
+      --rpm-defattrfile "644,project-dashboard,project-dashboard"
+      --rpm-defattrdir "644,project-dashboard,project-dashboard"
+{% else %}
+      -t deb \
+      --deb-user "project-dashboard" \
+      --deb-group "project-dashboard" \
+      --after-install afterinst \
+{% endif %}
+      --depends "nodejs" \
+      --directories {{ dashboard.home_dir }}/ \
+      --directories {{ dashboard.log_dir }}/ \
+      --vendor company \
+      --url http://company.com/ \
+      -m "Dmitry Malinovsky <dimitry.malinovsky@company.com>" \
+      --description "Adserver service" \
+      --before-install beforeinst \
+      --before-remove beforerm \
+      etc opt var

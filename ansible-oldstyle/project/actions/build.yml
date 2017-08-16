@@ -1,0 +1,20 @@
+---
+- hosts: builder
+  roles:
+    - role: adserver/build
+      tags: adserver
+
+- hosts: builder
+  roles:
+    - role: workserver/build
+      tags: workserver
+
+- hosts: builder
+  roles:
+    - role: queryserver/build
+      tags: queryserver
+
+- hosts: builder
+  roles:
+    - role: dashboard/build
+      tags: dashboard

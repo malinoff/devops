@@ -1,0 +1,28 @@
+---
+# TODO: write tasks for repository preparation when
+# deb/rpm repositories will be used
+
+# TODO: remove when deb/rpm repositories will be used
+- name: Copy the package to the target hosts
+  copy: src={{ package }} dest=/tmp/adserver.pkg
+
+- name: Install the package
+  apt: deb=/tmp/adserver.pkg
+  sudo: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install the package
+  yum: name=/tmp/adserver.pkg
+  sudo: yes
+  when: ansible_os_family == 'RedHat'
+
+# TODO: remove when deb/rpm repositories will be used
+- name: Remove the package from /tmp
+  file: path=/tmp/adserver.pkg state=absent
+
+# This may fail silently because the configuration is not ready yet,
+# but configure step will restart it after the configuration is placed
+- name: Restart the service (may result in an error)
+  service: name=project-adserver state=restarted
+  ignore_errors: yes
+  sudo: yes

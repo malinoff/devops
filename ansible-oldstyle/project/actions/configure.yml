@@ -1,0 +1,24 @@
+---
+- hosts: adserver
+  serial: 1
+  roles:
+    - role: adserver/configure
+      tags: adserver
+
+- hosts: workserver
+  serial: 1
+  roles:
+    - role: workserver/configure
+      tags: workserver
+
+- hosts: queryserver
+  serial: 1
+  roles:
+    - role: queryserver/configure
+      tags: queryserver
+
+- hosts: dashboard
+  serial: 1
+  roles:
+    - role: dashboard/configure
+      tags: dashboard

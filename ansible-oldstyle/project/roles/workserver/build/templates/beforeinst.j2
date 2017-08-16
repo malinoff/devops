@@ -1,0 +1,2 @@
+#!/bin/bash
+id -u project-workserver &>/dev/null || useradd -d /{{ workserver.home_dir }}/ -U -M -s /sbin/nologin -U project-workserver

@@ -1,0 +1,28 @@
+---
+- name: Make sure ntp config is present
+  copy: src=ntp.conf dest=/etc/ntp.conf
+  sudo: yes
+  notify:
+    - Restart the ntpd
+
+- name: Make sure sysconfig is present
+  template: src=sysconfig dest=/etc/sysconfig/{{ project_uid }}/{{ adserver_uid }}
+  sudo: yes
+  notify:
+    - Restart the adserver
+
+- name: Make sure default nginx site is disabled
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  sudo: yes
+  notify:
+    - Restart nginx
+
+- name: Make sure nginx config is present
+  template: src=nginx.j2 dest=/etc/nginx/conf.d/project-adserver.conf
+  sudo: yes
+  notify:
+    - Restart nginx
+
+- name: Make sure logrotate config is present
+  template: src=logrotate.j2 dest=/etc/logrotate.d/project-adserver
+  sudo: yes

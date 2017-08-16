@@ -1,0 +1,2 @@
+#!/bin/bash
+id -u project-adserver &>/dev/null || useradd -d /{{ adserver.home_dir }}/ -U -M -s /sbin/nologin -U project-adserver

@@ -1,0 +1,37 @@
+---
+- name: Install npm packages
+  shell: "npm install"
+  args:
+    chdir: "{{ dashboard.home_dir }}"
+
+- name: Run gulp tasks
+  shell: gulp build
+  args:
+    chdir: "{{ dashboard.home_dir }}"
+
+- name: Make sure sysconfig dir exists
+  file: path=/etc/sysconfig/{{ project_uid }}/ state=directory
+
+- name: Prepare environment variables
+  template: src=config.j2 dest=/etc/sysconfig/{{ project_uid }}/dashboard
+
+- name: Prepare haproxy configuration
+  template: src=haproxy.j2 dest=/tmp/haproxy/project_dashboard_backends.cfg
+
+- name: Update haproxy http frontend
+  shell: echo "    use_backend project-dashboard-back-http if { hdr(host) -i {{ 'test' if dashboard.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/http_frontend.cfg
+
+- name: Update haproxy https frontend
+  shell: echo "    use_backend project-dashboard-back-https if { req_ssl_sni -i {{ 'test' if dashboard.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/https_frontend.cfg
+
+- name: Make sure logs dir is present
+  file: path={{ dashboard.log_dir }} state=directory
+
+- name: Run the app
+  shell: >
+      set -a;
+      . /etc/sysconfig/{{ project_uid }}/dashboard;
+      pm2 start server.js -o {{ dashboard.log_dir }}/output.log -e {{ dashboard.log_dir }}/output.log --name project-dashboard ||
+      pm2 restart project-dashboard
+  args:
+    chdir: "{{ dashboard.home_dir }}"

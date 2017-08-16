@@ -1,0 +1,12 @@
+---
+- ec2:
+    key_name: infrastructure
+    instance_type: t2.micro
+    image: ami-b3cfa3c4
+    group: sg-main
+    wait: yes
+    assign_public_ip: yes
+    vpc_subnet_id: subnet-12e45b65
+    instance_tags: '{"Name": "ad+work+queryserver-ansible-autoprovisioned"}'
+    region: eu-west-1
+    instance_profile_name: iam_role

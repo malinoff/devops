@@ -1,0 +1,3 @@
+{% for name, value in workserver.items() -%}
+{{ name }}={{ value }}
+{% endfor -%}

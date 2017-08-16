@@ -1,0 +1,13 @@
+---
+workserver:
+    environment: beta
+    queue_uri: amqp://rabbit/vhost
+    queue_api: https://rabbit/vhost
+    ads_mongo_uri: 'mongodb://beta-ads:mongo:47942,mongo:47942/beta-ads?replicaSet=rs-ds047942'
+    log_level: warn
+    logentries_token: this-was-a-token
+    UV_THREADPOOL_SIZE: 20
+    NEW_RELIC_APP_NAME: beta-work-server
+    NEW_RELIC_LICENSE_KEY: this-was-a-key
+    NEW_RELIC_API_KEY: this-was-a-key
+    PORT: 8080

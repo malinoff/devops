@@ -1,0 +1,9 @@
+#!/bin/bash
+
+chkconfig --del project-workserver || true
+service project-workserver stop || true
+
+if [ "$1" != "upgrade" ]; then
+    groupdel project-workserver
+    userdel project-workserver
+fi

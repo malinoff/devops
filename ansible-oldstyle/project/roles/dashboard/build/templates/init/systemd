@@ -1,0 +1,21 @@
+[Unit]
+Description=Ad Server
+
+[Service]
+Type=forking
+# Default environment variables, i.e. configuration
+Environment="PROCESSES=1" "LOGFILE_OUT={{ dashboard.log_dir }}/output.log" "LOGFILE_ERR={{ dashboard.log_dir }}/error.log"
+# These variables will override the variables above
+EnvironmentFile=/etc/sysconfig/{{ project_uid }}/{{ dashboard_uid }}
+StandardOutput=null
+
+ExecStart={{ dashboard.home_dir }}/node_modules/pm2/bin/pm2 -i $PROCESSES start {{ dashboard.home_dir }}/server.js -o $LOGFILE_OUT -e $LOGFILE_ERR
+
+ExecStop={{ dashboard.home_dir }}/node_modules/pm2/bin/pm2 delete all
+ExecStop={{ dashboard.home_dir }}/node_modules/pm2/bin/pm2 kill
+
+User=project-dashboard
+Group=project-dashboard
+
+[Install]
+WantedBy=multi-user.target

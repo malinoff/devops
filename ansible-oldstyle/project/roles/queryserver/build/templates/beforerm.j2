@@ -1,0 +1,9 @@
+#!/bin/bash
+
+chkconfig --del project-queryserver || true
+service project-queryserver stop || true
+
+if [ "$1" != "upgrade" ]; then
+    groupdel project-queryserver
+    userdel project-queryserver
+fi

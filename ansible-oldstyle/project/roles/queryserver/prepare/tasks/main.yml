@@ -1,0 +1,37 @@
+---
+- name: Install npm packages
+  shell: "npm install"
+  args:
+    chdir: "{{ queryserver.home_dir }}"
+
+- name: Run gulp tasks
+  shell: gulp build
+  args:
+    chdir: "{{ queryserver.home_dir }}"
+
+- name: Make sure sysconfig dir exists
+  file: path=/etc/sysconfig/{{ project_uid }}/ state=directory
+
+- name: Prepare environment variables
+  template: src=config.j2 dest=/etc/sysconfig/{{ project_uid }}/queryserver
+
+- name: Prepare haproxy configuration
+  template: src=haproxy.j2 dest=/tmp/haproxy/project_queryserver_backends.cfg
+
+- name: Update haproxy http frontend
+  shell: echo "    use_backend project-queryserver-back-http if { hdr(host) -i {{ 'test' if queryserver.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/http_frontend.cfg
+
+- name: Update haproxy https frontend
+  shell: echo "    use_backend project-queryserver-back-https if { req_ssl_sni -i {{ 'test' if queryserver.environment == 'test' else 'dev' }}.ads.company.com }" >> /tmp/haproxy/https_frontend.cfg
+
+- name: Make sure logs dir is present
+  file: path={{ queryserver.log_dir }} state=directory
+
+- name: Run the app
+  shell: >
+      set -a;
+      . /etc/sysconfig/{{ project_uid }}/queryserver;
+      pm2 start server.js -o {{ queryserver.log_dir }}/output.log -e {{ queryserver.log_dir }}/output.log --name project-queryserver ||
+      pm2 restart project-queryserver
+  args:
+    chdir: "{{ queryserver.home_dir }}"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+chkconfig --del project-dashboard || true
+service project-dashboard stop || true
+
+if [ "$1" != "upgrade" ]; then
+    groupdel project-dashboard
+    userdel project-dashboard
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# `version` must be passed from the cli
+# I do not specify default value to fail ansible-playbook loudly
+
+fpm -s dir \
+      --name project-adserver \
+      --version {{ version }} \
+      --iteration {{ iteration }} \
+      -a noarch \
+{% if ansible_os_family == 'RedHat' %}
+      -t rpm \
+      --rpm-user "project-adserver" \
+      --rpm-group "project-adserver" \
+      --rpm-defattrfile "644,project-adserver,project-adserver"
+      --rpm-defattrdir "644,project-adserver,project-adserver"
+{% else %}
+      -t deb \
+      --deb-user "project-adserver" \
+      --deb-group "project-adserver" \
+      --after-install afterinst \
+{% endif %}
+      --depends "nodejs" \
+      --directories {{ adserver.home_dir }}/ \
+      --directories {{ adserver.log_dir }}/ \
+      --vendor company \
+      --url http://company.com/ \
+      -m "Dmitry Malinovsky <dimitry.malinovsky@company.com>" \
+      --description "Adserver service" \
+      --before-install beforeinst \
+      --before-remove beforerm \
+      etc opt var

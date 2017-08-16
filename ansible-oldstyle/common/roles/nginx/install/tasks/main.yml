@@ -1,0 +1,5 @@
+---
+- name: Make sure nginx is the latest
+  apt: name=nginx state=latest
+  sudo: yes
+  when: ansible_os_family == 'Debian'

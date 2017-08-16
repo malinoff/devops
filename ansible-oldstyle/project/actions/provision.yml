@@ -1,0 +1,24 @@
+---
+- hosts: provisioner
+  gather_facts: no
+  roles:
+    - role: adserver/provision
+      tags: adserver
+
+- hosts: provisioner
+  gather_facts: no
+  roles:
+    - role: workserver/provision
+      tags: workserver
+
+- hosts: provisioner
+  gather_facts: no
+  roles:
+    - role: queryserver/provision
+      tags: queryserver
+
+- hosts: provisioner
+  gather_facts: no
+  roles:
+    - role: dashboard/provision
+      tags: dashboard

@@ -1,0 +1,2 @@
+#!/bin/bash
+id -u project-dashboard &>/dev/null || useradd -d /{{ dashboard.home_dir }}/ -U -M -s /sbin/nologin -U project-dashboard

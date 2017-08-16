@@ -1,0 +1,12 @@
+---
+- name: Restart the queryserver
+  service: name=project-queryserver state=restarted
+  sudo: yes
+
+- name: Restart nginx
+  service: name=nginx state=restarted
+  sudo: yes
+
+- name: Restart the ntpd
+  service: name=ntp state=restarted
+  sudo: yes

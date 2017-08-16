@@ -1,0 +1,3 @@
+[builder]
+# Assuming local execution on Jenkins master/slave
+localhost ansible_connection=local

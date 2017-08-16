@@ -1,0 +1,38 @@
+---
+- name: Make sure curl is installed
+  apt: name=curl update_cache=yes
+  sudo: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Make sure nodejs repository is present
+  shell: "curl -sL https://deb.nodesource.com/setup_{{ nodejs_version }} | bash -"
+  sudo: yes
+  args:
+      creates: /etc/apt/sources.list.d/nodesource.list
+  when: ansible_os_family == 'Debian'
+
+- name: Make sure nodejs is installed
+  apt: name=nodejs update_cache=yes
+  sudo: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Check if nodejs repository is installed
+  shell: yum list installed | grep nodesource-release
+  register: nodesource
+  when: ansible_os_family == 'RedHat'
+
+- name: Make sure epel repository is installed
+  yum: name=epel-release
+  sudo: yes
+  when: ansible_os_family == 'RedHat' and not nodesource.stdout
+
+- name: Install nodejs repository
+  shell:  "curl -sL https://rpm.nodesource.com/setup | bash -"
+  sudo: yes
+  when: ansible_os_family == 'RedHat' and not nodesource.stdout
+
+# XXX 0.12 is not present on CentOS 7
+- name: Make sure nodejs is installed
+  yum: name=nodejs-{{ nodejs_version }}
+  sudo: yes
+  when: ansible_os_family == 'RedHat'

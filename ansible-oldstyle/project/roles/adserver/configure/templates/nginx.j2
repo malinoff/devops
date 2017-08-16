@@ -1,0 +1,27 @@
+server {
+    listen 80;
+    server_tokens off;
+
+    location = / {
+      proxy_pass http://localhost:{{ adserver.PORT }};
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      break;
+    }
+
+    location ^~ / {
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      proxy_next_upstream error;
+      client_max_body_size 8m;
+
+      if ($http_x_forwarded_proto != 'https') {
+          rewrite ^ https://$host$request_uri? permanent;
+      } 
+      proxy_pass http://localhost:{{ adserver.PORT }};
+    }
+}

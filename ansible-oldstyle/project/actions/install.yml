@@ -1,0 +1,56 @@
+---
+- hosts: adserver
+  serial: 1
+  pre_tasks:
+    - name: Send pre-install notification to the new relic
+      shell: curl -H 'x-api-key:{{ adserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ adserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation started, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: adserver
+  roles:
+    - role: adserver/install
+      tags: adserver
+  post_tasks:
+    - name: Send install notification to the new relic
+      shell: curl -H 'x-api-key:{{ adserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ adserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation completed, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: adserver
+
+- hosts: workserver
+  serial: 1
+  pre_tasks:
+    - name: Send pre-install notification to the new relic
+      shell: curl -H 'x-api-key:{{ workserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ workserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation started, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: workserver
+  roles:
+    - role: workserver/install
+      tags: workserver
+  post_tasks:
+    - name: Send install notification to the new relic
+      shell: curl -H 'x-api-key:{{ workserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ workserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation completed, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: workserver
+
+- hosts: queryserver
+  serial: 1
+  pre_tasks:
+    - name: Send pre-install notification to the new relic
+      shell: curl -H 'x-api-key:{{ queryserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ queryserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation started, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: queryserver
+  roles:
+    - role: queryserver/install
+      tags: queryserver
+  post_tasks:
+    - name: Send install notification to the new relic
+      shell: curl -H 'x-api-key:{{ queryserver.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ queryserver.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation completed, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: queryserver
+
+- hosts: dashboard
+  serial: 1
+  pre_tasks:
+    - name: Send pre-install notification to the new relic
+      shell: curl -H 'x-api-key:{{ dashboard.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ dashboard.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation started, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: dashboard
+  roles:
+    - role: dashboard/install
+      tags: dashboard
+  post_tasks:
+    - name: Send install notification to the new relic
+      shell: curl -H 'x-api-key:{{ dashboard.NEW_RELIC_API_KEY }}' -d 'deployment[app_name]={{ dashboard.NEW_RELIC_APP_NAME }}' -d 'deployment[description]=Installation completed, {{ jenkins_link }}' https://api.newrelic.com/deployments.xml
+      tags: dashboard
