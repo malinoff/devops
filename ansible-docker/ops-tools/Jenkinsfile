@@ -79,7 +79,7 @@ pipeline {
 
             message = 'sanity check failed'
             git changelog: false, credentialsId: 'integration', poll: false, url: 'git@github.com:company/integration-tests.git'
-            withMaven(maven: 'maven-3.3.9', mavenSettingsConfig: 'vertigo-public') {
+            withMaven(maven: 'maven-3.3.9', mavenSettingsConfig: 'public') {
               sh "mvn test -Dcompany.env=qa -Dtest=ProjectSanityCheckSuite"
             }
             junit 'target/surefire-reports/*.xml'
